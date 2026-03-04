@@ -6,9 +6,11 @@ import (
 	"github.com/samber/do/v2"
 )
 
-func InitController(injector do.Injector, router *gin.RouterGroup) {
+func InitController(injector do.Injector, router *gin.RouterGroup) error {
 	healthGroup := router.Group("health")
 
 	handler := health.NewHandler(injector)
 	healthGroup.GET("/:type", handler.Handle)
+
+	return nil
 }

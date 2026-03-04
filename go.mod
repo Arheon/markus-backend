@@ -4,7 +4,10 @@ go 1.25.7
 
 require github.com/ilyakaznacheev/cleanenv v1.5.0
 
-require github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
+require (
+	github.com/google/uuid v1.6.0 // indirect
+	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
+)
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect

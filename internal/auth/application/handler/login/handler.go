@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/Arheon/markus-backend/internal/auth/domain/repository"
-	domainHelpers "github.com/Arheon/markus-backend/internal/auth/infrastructure/helpers"
 	"github.com/Arheon/markus-backend/internal/shared/domain/entity"
+	"github.com/Arheon/markus-backend/internal/shared/infrastructure/helpers"
 	jwt "github.com/appleboy/gin-jwt/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -47,7 +47,7 @@ func (h *Handler) HandleAuthenticate(ctx *gin.Context) (any, error) {
 		return "", ErrInvalidLoginValues
 	}
 
-	if domainHelpers.CheckPasswordHash(password, user.Password) == false {
+	if helpers.CheckPasswordHash(password, user.Password) == false {
 		return "", ErrInvalidLoginValues
 	}
 

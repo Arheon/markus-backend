@@ -6,13 +6,15 @@ import (
 	"github.com/samber/do/v2"
 )
 
-func NewRouter(c do.Injector, router *gin.Engine) *gin.Engine {
+func NewRouter(c do.Injector, router *gin.Engine) (*gin.Engine, error) {
 	if router == nil {
 		router = gin.New()
 	}
 
 	router.Use(gin.Recovery())
 
-	v1.InitV1(c, router)
-	return router
+	if err := v1.InitV1(c, router); err != nil {
+		return nil, err
+	}
+	return router, nil
 }

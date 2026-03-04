@@ -28,7 +28,10 @@ func Init(env string, injector do.Injector) {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	r := router.NewRouter(injector, nil)
+	r, err := router.NewRouter(injector, nil)
+	if err != nil {
+		logger.Fatal(err)
+	}
 
 	srv := &http.Server{
 		Addr:    cfg.Server.Port,

@@ -6,7 +6,7 @@ import (
 	"github.com/samber/do/v2"
 )
 
-func NewRouter(c do.Injector, router *gin.Engine) *gin.Engine {
+func NewRouter(c *do.Injector, router *gin.Engine) *gin.Engine {
 	if router == nil {
 		router = gin.New()
 	}

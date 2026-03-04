@@ -8,11 +8,11 @@ import (
 )
 
 type HealthProbe struct {
-	injector     do.Injector
+	injector     *do.Injector
 	strategyList []Strategy
 }
 
-func NewHealthProbe(injector do.Injector) *HealthProbe {
+func NewHealthProbe(injector *do.Injector) *HealthProbe {
 	return &HealthProbe{
 		injector: injector,
 	}
@@ -24,7 +24,7 @@ func (hp *HealthProbe) AddStrategy(strategy Strategy) {
 }
 
 func (hp *HealthProbe) ExecuteStrategy(probe StrategyType) (*StrategyResult, error) {
-	logger := do.MustInvoke[*logrus.Logger](hp.injector)
+	logger := do.MustInvoke[*logrus.Logger](*hp.injector)
 
 	for _, strategy := range hp.strategyList {
 		if !strategy.Support(probe) {

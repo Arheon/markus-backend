@@ -17,6 +17,7 @@ build-app:
 	docker compose exec go_api go build -o ./build/app -tags=musl cmd/app/app.go
 
 run:
-	docker compose exec go_api ./build/app
+	docker compose exec go_api ./build/app --env=dev
+
 bash:
 	docker compose exec go_api bash

@@ -10,17 +10,17 @@ import (
 )
 
 type HealthHandler struct {
-	injector do.Injector
+	injector *do.Injector
 }
 
-func NewHandler(injector do.Injector) *HealthHandler {
+func NewHandler(injector *do.Injector) *HealthHandler {
 	return &HealthHandler{
 		injector: injector,
 	}
 }
 
 func (h *HealthHandler) Handle(context *gin.Context) {
-	logger, loggerOk := do.InvokeAs[*logrus.Logger](h.injector)
+	logger, loggerOk := do.InvokeAs[*logrus.Logger](*h.injector)
 
 	var bind urlbind
 	if err := context.ShouldBindUri(&bind); err != nil {

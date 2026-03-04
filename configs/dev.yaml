@@ -1,7 +1,0 @@
-database:
-  driver: postgres
-  dsn: postgres://bk_dev:dev@localhost:8884/bk_dev?sslmode=disable&connect_timeout=1
-server:
-  port: :8025
-auth:
-  jwt_token_lookup: "header:Authorization,cookie:jwt"

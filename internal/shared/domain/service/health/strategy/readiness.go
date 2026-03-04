@@ -6,10 +6,10 @@ import (
 )
 
 type Readiness struct {
-	injector do.Injector
+	injector *do.Injector
 }
 
-func (r *Readiness) SetContainer(injector do.Injector) {
+func (r *Readiness) SetContainer(injector *do.Injector) {
 	r.injector = injector
 }
 

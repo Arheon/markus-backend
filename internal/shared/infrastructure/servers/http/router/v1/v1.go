@@ -6,7 +6,6 @@ import (
 	"github.com/samber/do/v2"
 )
 
-func InitV1(injector do.Injector, router *gin.Engine) {
-	v1 := router.Group("v1")
-	health.InitController(injector, v1)
+func InitV1(injector *do.Injector, router *gin.Engine) {
+	health.InitController(injector, router)
 }

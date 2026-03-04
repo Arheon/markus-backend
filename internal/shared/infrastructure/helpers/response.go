@@ -27,6 +27,22 @@ func AbortWithDomainErrorJSON(c *gin.Context, e domainerrors.Error) {
 	)
 }
 
+func AbortWithError401JSON(c *gin.Context, message string, code int, title string, subtitle string) {
+	c.AbortWithStatusJSON(
+		http.StatusUnauthorized,
+		gin.H{
+			"status":   "error",
+			"techwork": nil,
+			"error":    code,
+			"message":  message,
+			"message_ext": map[string]any{
+				"title":    title,
+				"subtitle": subtitle,
+			},
+		},
+	)
+}
+
 func AbortWithError400JSON(c *gin.Context, message string, code int, title, subtitle string) {
 	c.AbortWithStatusJSON(
 		http.StatusBadRequest,

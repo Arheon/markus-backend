@@ -9,17 +9,17 @@ import (
 )
 
 type Liveness struct {
-	container *do.Injector
+	container do.Injector
 }
 
-func (l *Liveness) SetContainer(container *do.Injector) {
+func (l *Liveness) SetContainer(container do.Injector) {
 	l.container = container
 }
 
 func (l *Liveness) Execute() (*health.StrategyResult, error) {
 	databaseLiveness := true
 
-	db, err := do.InvokeAs[*gorm.DB](*l.container)
+	db, err := do.InvokeAs[*gorm.DB](l.container)
 	if err != nil {
 		databaseLiveness = false
 	}

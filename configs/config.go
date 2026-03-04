@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"slices"
 
@@ -19,6 +20,11 @@ type Config struct {
 	Server struct {
 		Port string `env:"PORT"`
 	}
+	Auth struct {
+		JwtTokenLookup         string `env:"JWT_TOKEN_LOOKUP"`
+		RefreshTokenCookieName string `env:"REFRESH_TOKEN_COOKIE_NAME"`
+		IdentityKey            string `env:"IDENTITY_KEY"`
+	} `env-prefix:"USER_APP_AUTH_"`
 }
 
 const EnvTesting = "testing"
@@ -53,6 +59,8 @@ func NewConfig(env string) (*Config, error) {
 		envHelp, _ := cleanenv.GetDescription(config, nil)
 		fmt.Println(envHelp)
 	}
+
+	log.Println(config)
 
 	return config, nil
 }

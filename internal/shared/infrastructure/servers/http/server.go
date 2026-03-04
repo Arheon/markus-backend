@@ -7,19 +7,22 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Arheon/markus-backend/config"
+	"github.com/Arheon/markus-backend/configs"
 	"github.com/Arheon/markus-backend/internal/shared/infrastructure/servers/http/router"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/do/v2"
 	"github.com/sirupsen/logrus"
 )
 
-func Init(env string, injector *do.Injector) {
-	logger := do.MustInvokeAs[*logrus.Logger](*injector)
-	cfg := do.MustInvokeAs[*config.Config](*injector)
+func Init(env string, injector do.Injector) {
+	logger := do.MustInvokeAs[*logrus.Logger](injector)
+	cfg := do.MustInvokeAs[*config.Config](injector)
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
+	defer func() {
+		injector.RootScope().ShutdownOnSignals()
+		stop()
+	}()
 
 	if env == "PROD" {
 		gin.SetMode(gin.ReleaseMode)

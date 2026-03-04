@@ -10,12 +10,12 @@ const (
 )
 
 type StrategyResult struct {
-	Type    StrategyType
-	Payload any
+	Type    StrategyType `json:"type"`
+	Payload any          `json:"payload"`
 }
 
 type Strategy interface {
-	SetContainer(container *do.Injector)
+	SetContainer(container do.Injector)
 	Execute() (*StrategyResult, error)
 	Support(probe StrategyType) bool
 }

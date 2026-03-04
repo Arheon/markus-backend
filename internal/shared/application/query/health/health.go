@@ -8,17 +8,17 @@ import (
 )
 
 type HealthQuery struct {
-	injector *do.Injector
+	injector do.Injector
 }
 
-func NewQuery(injector *do.Injector) *HealthQuery {
+func NewQuery(injector do.Injector) *HealthQuery {
 	return &HealthQuery{
 		injector: injector,
 	}
 }
 
 func (h *HealthQuery) Handle(probeName string) (*health.StrategyResult, error) {
-	logger := do.MustInvokeAs[*logrus.Logger](*h.injector)
+	logger := do.MustInvokeAs[*logrus.Logger](h.injector)
 
 	healthprobe := health.NewHealthProbe(h.injector)
 	healthprobe.AddStrategy(&strategy.Liveness{})

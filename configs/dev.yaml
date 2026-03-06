@@ -5,3 +5,4 @@ server:
   port: :8025
 auth:
   jwt_token_lookup: "header:Authorization,cookie:jwt"
+  identity_key: "id"

@@ -48,7 +48,14 @@ func (h *Handler) LogoutResponse(ctx *gin.Context) {
 	}
 
 	if exists {
-		response["user_info"] = user.(*entity.User).Username
+		switch v := user.(type) {
+		case string:
+			response["user_info"] = v
+		case *entity.User:
+			response["user_info"] = v.Username
+		default:
+			response["user_info"] = user
+		}
 	}
 
 	helpers.SuccessJSONV2(ctx, response)

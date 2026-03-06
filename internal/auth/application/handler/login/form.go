@@ -1,6 +1,6 @@
 package login
 
 type LoginForm struct {
-	Login    string `json:"login"`
+	UserName string `json:"username"`
 	Password string `json:"password"`
 }

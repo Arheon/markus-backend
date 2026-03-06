@@ -4,8 +4,15 @@ import (
 	"log"
 	"time"
 
-	"github.com/Arheon/markus-backend/configs"
+	config "github.com/Arheon/markus-backend/configs"
+	serverDomain "github.com/Arheon/markus-backend/internal/server/domain/entity"
+	serverRepository "github.com/Arheon/markus-backend/internal/server/domain/repository"
+	serverServerRepository "github.com/Arheon/markus-backend/internal/server/infrastructure/repository/server"
+	sharedDomainEntity "github.com/Arheon/markus-backend/internal/shared/domain/entity"
 	"github.com/Arheon/markus-backend/internal/shared/infrastructure/servers/http"
+	userDomainEntity "github.com/Arheon/markus-backend/internal/user/domain/entity"
+	userRepository "github.com/Arheon/markus-backend/internal/user/domain/repository"
+	userUserRepository "github.com/Arheon/markus-backend/internal/user/infrastructure/repository/user"
 	jwt "github.com/appleboy/gin-jwt/v3"
 	"github.com/samber/do/v2"
 	"github.com/sirupsen/logrus"
@@ -15,8 +22,10 @@ import (
 	"github.com/Arheon/markus-backend/internal/auth/application/handler/identity"
 	"github.com/Arheon/markus-backend/internal/auth/application/handler/login"
 	"github.com/Arheon/markus-backend/internal/auth/application/handler/logout"
+	authDomainEntity "github.com/Arheon/markus-backend/internal/auth/domain/entity"
 	authRepository "github.com/Arheon/markus-backend/internal/auth/domain/repository"
 	jwtMiddlewareHelpers "github.com/Arheon/markus-backend/internal/auth/infrastructure/middleware/jwt"
+	authUserRepository "github.com/Arheon/markus-backend/internal/auth/infrastructure/repository/user"
 )
 
 func InitApp(env string) error {
@@ -36,6 +45,17 @@ func InitApp(env string) error {
 			DisableForeignKeyConstraintWhenMigrating: true,
 		})
 
+		db.AutoMigrate(
+			&authDomainEntity.User{},
+			&sharedDomainEntity.User{},
+			&userDomainEntity.User{},
+			&serverDomain.User{},
+			&serverDomain.Message{},
+			&serverDomain.Room{},
+			&serverDomain.RoomCategory{},
+			&serverDomain.Server{},
+		)
+
 		if nil != err {
 			log.Fatalln("Connection to database failed", err)
 		} else {
@@ -54,26 +74,36 @@ func InitApp(env string) error {
 	})
 
 	do.Provide(injector, func(i do.Injector) (*jwt.GinJWTMiddleware, error) {
+		logger, err := do.InvokeAs[*logrus.Logger](i)
+		if err != nil {
+			return nil, err
+		}
+
 		config, err := do.InvokeAs[*config.Config](i)
 		if err != nil {
 			return nil, err
 		}
 
-		userRepo, err := do.InvokeAs[*authRepository.UserRepository](i)
+		userRepo, err := do.InvokeAs[authRepository.UserRepository](i)
 		if err != nil {
 			return nil, err
 		}
 
 		identityHandler := identity.Handler{}
-		loginHandler := login.NewHandler(*userRepo)
+		loginHandler := login.NewHandler(logger, userRepo)
 		logoutHandler := logout.NewHandler()
+
+		identityKey := config.Auth.IdentityKey
+		if identityKey == "" {
+			identityKey = "id"
+		}
 
 		authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 			Realm:       "test zone",
 			Key:         []byte("secret key"),
 			Timeout:     time.Hour,
 			MaxRefresh:  time.Hour,
-			IdentityKey: config.Auth.IdentityKey,
+			IdentityKey: identityKey,
 			PayloadFunc: jwtMiddlewareHelpers.PayloadFunc,
 
 			IdentityHandler: identityHandler.Handle,
@@ -87,6 +117,33 @@ func InitApp(env string) error {
 		})
 
 		return authMiddleware, nil
+	})
+
+	do.Provide(injector, func(i do.Injector) (authRepository.UserRepository, error) {
+		db, err := do.InvokeAs[*gorm.DB](i)
+		if err != nil {
+			return nil, err
+		}
+
+		return authUserRepository.NewRepository(db), nil
+	})
+
+	do.Provide(injector, func(i do.Injector) (userRepository.UserRepository, error) {
+		db, err := do.InvokeAs[*gorm.DB](i)
+		if err != nil {
+			return nil, err
+		}
+
+		return userUserRepository.NewRepository(db), nil
+	})
+
+	do.Provide(injector, func(i do.Injector) (serverRepository.ServerRepository, error) {
+		db, err := do.InvokeAs[*gorm.DB](i)
+		if err != nil {
+			return nil, err
+		}
+
+		return serverServerRepository.NewRepository(db), nil
 	})
 
 	http.Init(env, injector)

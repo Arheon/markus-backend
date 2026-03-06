@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/Arheon/markus-backend/internal/auth/domain/repository"
-	"github.com/Arheon/markus-backend/internal/shared/domain/entity"
 	"github.com/Arheon/markus-backend/internal/shared/infrastructure/helpers"
 	jwt "github.com/appleboy/gin-jwt/v3"
 	"github.com/gin-gonic/gin"
@@ -20,8 +19,9 @@ type Handler struct {
 	userRepo repository.UserRepository
 }
 
-func NewHandler(repo repository.UserRepository) *Handler {
+func NewHandler(logger *logrus.Logger, repo repository.UserRepository) *Handler {
 	return &Handler{
+		logger:   logger,
 		userRepo: repo,
 	}
 }
@@ -37,11 +37,11 @@ func (h *Handler) HandleAuthenticate(ctx *gin.Context) (any, error) {
 		return "", jwt.ErrMissingLoginValues
 	}
 
-	userID := loginVals.Login
+	userID := loginVals.UserName
 	password := loginVals.Password
 
 	h.logger.Debug("Try to find user by userID")
-	user, err := h.userRepo.GetUserByUsername(userID)
+	user, err := h.userRepo.GetUserByUsername(ctx, userID)
 	if err != nil {
 		h.logger.Errorf("Could't find user by userName %s", userID)
 		return "", ErrInvalidLoginValues
@@ -51,13 +51,12 @@ func (h *Handler) HandleAuthenticate(ctx *gin.Context) (any, error) {
 		return "", ErrInvalidLoginValues
 	}
 
+	h.logger.Debug("ABOBA2", user.ID, user.Password)
+
 	return user, nil
 }
 
 // TODO: Переделать на нормальную авторизацию
 func (h *Handler) HandleAuthorize(c *gin.Context, data any) bool {
-	if v, ok := data.(*entity.User); ok && v.Username == "admin" {
-		return true
-	}
-	return false
+	return true
 }

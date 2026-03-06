@@ -3,6 +3,7 @@ package v1
 import (
 	"github.com/Arheon/markus-backend/internal/shared/infrastructure/servers/http/router/v1/auth"
 	"github.com/Arheon/markus-backend/internal/shared/infrastructure/servers/http/router/v1/health"
+	"github.com/Arheon/markus-backend/internal/shared/infrastructure/servers/http/router/v1/server"
 	"github.com/Arheon/markus-backend/internal/shared/infrastructure/servers/http/router/v1/user"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/do/v2"
@@ -19,6 +20,10 @@ func InitV1(injector do.Injector, router *gin.Engine) error {
 	}
 
 	if err := user.InitContrioller(injector, v1); err != nil {
+		return err
+	}
+
+	if err := server.InitController(injector, v1); err != nil {
 		return err
 	}
 

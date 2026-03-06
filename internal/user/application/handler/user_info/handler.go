@@ -34,5 +34,5 @@ func (h *Handler) Handle(ctx *gin.Context) {
 		return
 	}
 
-	globalHelpers.SuccessJSONV2(ctx, user)
+	globalHelpers.SuccessJSONV2(ctx, FromUser(user))
 }

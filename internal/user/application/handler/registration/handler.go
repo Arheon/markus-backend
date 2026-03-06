@@ -37,7 +37,7 @@ func (h *Handler) Handle(ctx *gin.Context) {
 		return
 	}
 
-	err = command.Handle(userID, hashPassword)
+	user, err := command.Handle(userID, hashPassword)
 	if err != nil {
 		globalHelpers.AbortWithError(ctx, err)
 		return
@@ -45,5 +45,6 @@ func (h *Handler) Handle(ctx *gin.Context) {
 
 	globalHelpers.SuccessJSONV2(ctx, map[string]any{
 		"message": "User create successfuly",
+		"user":    user,
 	})
 }

@@ -81,8 +81,27 @@ func TestCommand_Handle(t *testing.T) {
 			wantErr:  true,
 			want:     "",
 		},
+		{
+			name: "username is invalid",
+			userRepo: func() repository.UserRepository {
+				return repositoryMock.NewMockUserRepository(t)
+			},
+			username: "a",
+			password: "a",
+			wantErr:  true,
+			want:     "",
+		},
+		{
+			name: "password is invalid",
+			userRepo: func() repository.UserRepository {
+				return repositoryMock.NewMockUserRepository(t)
+			},
+			username: "arheon",
+			password: "a",
+			wantErr:  true,
+			want:     "",
+		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := NewCommand(context.Background(), tt.userRepo())

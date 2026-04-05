@@ -4,7 +4,7 @@ import "errors"
 
 const (
 	minPassLen = 8
-	maxPassLen = 72 // bcrypt silently truncates beyond 72 bytes
+	maxPassLen = 72
 )
 
 var (

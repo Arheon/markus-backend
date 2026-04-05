@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -61,6 +62,7 @@ func (s *ServerRepositoryTestSuite) TearDownSuite() {
 
 func (s *ServerRepositoryTestSuite) SetupTest() {
 	s.db.Exec("TRUNCATE TABLE servers RESTART IDENTITY CASCADE")
+	s.db.Exec("TRUNCATE TABLE users RESTART IDENTITY CASCADE")
 }
 
 func (s *ServerRepositoryTestSuite) TestCreateServer() {
@@ -76,19 +78,31 @@ func (s *ServerRepositoryTestSuite) TestCreateServer() {
 		name        string
 		prepareDB   func() error
 		expextedErr error
+		serverName  *string
 	}{
 		{
 			name:        "Error undefined user",
 			prepareDB:   nil,
 			expextedErr: ErrUndefinedUser,
+			serverName:  &serverName,
 		},
 		{
-			name: "Success create user",
+			name: "Success create server",
 			prepareDB: func() error {
 				err := gorm.G[any](s.db).Exec(ctx, fmt.Sprintf("INSERT INTO users (id, username, password) VALUES ('%s', '%s', '%s')", userId, userName, password))
 				return err
 			},
 			expextedErr: nil,
+			serverName:  &serverName,
+		},
+		{
+			name: "Error create server",
+			prepareDB: func() error {
+				err := gorm.G[any](s.db).Exec(ctx, fmt.Sprintf("INSERT INTO users (id, username, password) VALUES ('%s', '%s', '%s')", userId, userName, password))
+				return err
+			},
+			expextedErr: errors.New("Undefined db"),
+			serverName:  nil,
 		},
 	}
 
@@ -102,7 +116,7 @@ func (s *ServerRepositoryTestSuite) TestCreateServer() {
 				return
 			}
 
-			server, err := s.repo.CreateNewServer(ctx, userId, serverName)
+			server, err := s.repo.CreateNewServer(ctx, userId, *tt.serverName)
 			if tt.expextedErr != nil {
 				s.ErrorIs(err, tt.expextedErr)
 				return

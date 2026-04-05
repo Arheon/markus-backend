@@ -30,14 +30,7 @@ func (h *Handler) Handle(ctx *gin.Context) {
 	command := createuser.NewCommand(ctx, h.userRepository)
 	h.logger.Debug("Try to create new user")
 
-	userID := form.Username
-	hashPassword, err := globalHelpers.HashPassword(form.Password)
-	if err != nil {
-		globalHelpers.AbortWithError(ctx, err)
-		return
-	}
-
-	user, err := command.Handle(userID, hashPassword)
+	user, err := command.Handle(form.Username, form.Password)
 	if err != nil {
 		globalHelpers.AbortWithError(ctx, err)
 		return

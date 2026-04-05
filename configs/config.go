@@ -32,7 +32,6 @@ const EnvTesting = "testing"
 var envs = []string{"dev", "prod", EnvTesting}
 
 func NewConfig(env string) (*Config, error) {
-
 	if !slices.Contains(envs, env) {
 		return nil, errors.New("incorrect config env")
 	}

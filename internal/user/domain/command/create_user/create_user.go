@@ -4,8 +4,11 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Arheon/markus-backend/internal/user/domain/entity"
 	"github.com/Arheon/markus-backend/internal/user/domain/repository"
+	"github.com/Arheon/markus-backend/internal/user/domain/service/auth"
+
+	globalHelpers "github.com/Arheon/markus-backend/internal/shared/infrastructure/helpers"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 var ErrCantCreateUser = errors.New("can't create user")
@@ -22,11 +25,24 @@ func NewCommand(ctx context.Context, userRepo repository.UserRepository) *Comman
 	}
 }
 
-func (c *Command) Handle(username string, password string) (*entity.User, error) {
-	user, err := c.userRepo.CreateNewUserOrErrorIfExists(c.ctx, username, password)
-	if err != nil {
-		return nil, err
+func (c *Command) Handle(username string, password string) (string, error) {
+	var sanitiser = bluemonday.StrictPolicy()
+	username = sanitiser.Sanitize(username)
+	password = sanitiser.Sanitize(password)
+
+	if err := auth.ValidateUsername(username); err != nil {
+		return "", err
 	}
 
-	return user, nil
+	if err := auth.ValidatePasswordStrangth(password); err != nil {
+		return "", err
+	}
+
+	hashPassword, err := globalHelpers.HashPassword(password)
+	user, err := c.userRepo.CreateNewUserOrErrorIfExists(c.ctx, username, hashPassword)
+	if err != nil {
+		return "", err
+	}
+
+	return user.ID, nil
 }

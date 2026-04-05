@@ -1,6 +1,6 @@
 database:
   driver: postgres
-  dsn: postgres://user:password@postgres:5432/markus?sslmode=disable&connect_timeout=1
+  dsn: postgres://user:password@localhost:8884/markus_test?sslmode=disable&connect_timeout=1
 server:
   port: :8025
 auth:

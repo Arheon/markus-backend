@@ -22,13 +22,13 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/Arheon/markus-backend/internal/auth/application/handler/identity"
-	"github.com/Arheon/markus-backend/internal/auth/application/handler/login"
-	"github.com/Arheon/markus-backend/internal/auth/application/handler/logout"
 	authDomainEntity "github.com/Arheon/markus-backend/internal/auth/domain/entity"
 	authRepository "github.com/Arheon/markus-backend/internal/auth/domain/repository"
 	jwtMiddlewareHelpers "github.com/Arheon/markus-backend/internal/auth/infrastructure/middleware/jwt"
 	authUserRepository "github.com/Arheon/markus-backend/internal/auth/infrastructure/repository/user"
+	"github.com/Arheon/markus-backend/internal/auth/infrastructure/server/http/handler/identity"
+	"github.com/Arheon/markus-backend/internal/auth/infrastructure/server/http/handler/login"
+	"github.com/Arheon/markus-backend/internal/auth/infrastructure/server/http/handler/logout"
 	"github.com/Arheon/markus-backend/pkg/outbox/broker/kafka"
 	storeGorm "github.com/Arheon/markus-backend/pkg/outbox/store/gorm"
 )

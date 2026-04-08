@@ -48,7 +48,7 @@ func (s *ServerRepositoryTestSuite) SetupSuite() {
 	db, err := gorm.Open(gormPostgres.Open(connStr), &gorm.Config{})
 	s.NoError(err)
 
-	err = db.AutoMigrate(domainEntity.User{})
+	err = db.AutoMigrate(domainEntity.Member{})
 	s.NoError(err)
 
 	s.container = pgContainer

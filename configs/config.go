@@ -12,19 +12,28 @@ import (
 )
 
 type Config struct {
-	Env      string `env:"USER_APP_ENV"`
+	Secret   string `env:"SECRET" yaml:"secret"`
+	Env      string `env:"USER_APP_ENV" yaml:"env"`
 	Database struct {
-		Driver string `env:"DRIVER"`
-		DSN    string `env:"DSN"`
-	} `env-prefix:"USER_APP_DB_"`
+		Driver string `env:"DRIVER" yaml:"driver"`
+		DSN    string `env:"DSN" yaml:"dsn"`
+	} `yaml:"database"`
 	Server struct {
-		Port string `env:"PORT"`
-	}
+		Port string `env:"PORT" yaml:"port"`
+	} `yaml:"server"`
 	Auth struct {
-		JwtTokenLookup         string `env:"JWT_TOKEN_LOOKUP"`
-		RefreshTokenCookieName string `env:"REFRESH_TOKEN_COOKIE_NAME"`
-		IdentityKey            string `env:"IDENTITY_KEY"`
-	} `env-prefix:"USER_APP_AUTH_"`
+		JwtTokenLookup         string `env:"JWT_TOKEN_LOOKUP" yaml:"jwt_token_lookup"`
+		RefreshTokenCookieName string `env:"REFRESH_TOKEN_COOKIE_NAME" yaml:"refresh_token_cookie_name"`
+		IdentityKey            string `env:"IDENTITY_KEY" yaml:"identity_key"`
+	} `yaml:"auth"`
+	Broker struct {
+		KafkaDSN     string `yaml:"kafka_dsn"`
+		BrokerTopics struct {
+			Server  string `env:"SERVER" yaml:"server"`
+			User    string `env:"USER" yaml:"user"`
+			Message string `env:"MESSAGE" yaml:"message"`
+		} `yaml:"broker_topics"`
+	} `yaml:"broker"`
 }
 
 const EnvTesting = "testing"
@@ -59,7 +68,7 @@ func NewConfig(env string) (*Config, error) {
 		fmt.Println(envHelp)
 	}
 
-	log.Println(config)
+	log.Println(env, config)
 
 	return config, nil
 }

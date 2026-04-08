@@ -51,8 +51,6 @@ func (h *Handler) HandleAuthenticate(ctx *gin.Context) (any, error) {
 		return "", ErrInvalidLoginValues
 	}
 
-	h.logger.Debug("ABOBA2", user.ID, user.Password)
-
 	return user, nil
 }
 

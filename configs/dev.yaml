@@ -1,8 +1,16 @@
+env: "dev"
+secret: "def4e132-4941-4c1d-8aed-eb89b8197066"
 database:
   driver: postgres
   dsn: postgres://user:password@postgres:5432/markus?sslmode=disable&connect_timeout=1
 server:
-  port: :8025
+  port: :8080
 auth:
   jwt_token_lookup: "header:Authorization,cookie:jwt"
   identity_key: "id"
+broker:
+  kafka_dsn: kafka:9092
+  broker_topics:
+    server: "dev.markus.server_events"
+    user: "dev.markus.user_events"
+    message: "dev.markus.message_events"

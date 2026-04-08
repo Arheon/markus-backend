@@ -1,9 +1,10 @@
 package server
 
 import (
-	createnewserver "github.com/Arheon/markus-backend/internal/server/application/handler/create_new_server"
-	getuserservers "github.com/Arheon/markus-backend/internal/server/application/handler/get_user_servers"
 	domainRepository "github.com/Arheon/markus-backend/internal/server/domain/repository"
+	createnewserver "github.com/Arheon/markus-backend/internal/server/infrastructure/server/http/handler/create_server"
+	getuserservers "github.com/Arheon/markus-backend/internal/server/infrastructure/server/http/handler/get_user_servers"
+	"github.com/Arheon/markus-backend/pkg/outbox"
 	jwt "github.com/appleboy/gin-jwt/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/do/v2"
@@ -15,15 +16,19 @@ func InitController(injector do.Injector, router *gin.RouterGroup) error {
 		return err
 	}
 
-	serverGroup := router.Group("server", authMiddleware.MiddlewareFunc())
+	publisher, err := do.InvokeAs[*outbox.Publisher](injector)
+	if err != nil {
+		return err
+	}
 
 	serverRepo, err := do.InvokeAs[domainRepository.ServerRepository](injector)
 	if err != nil {
 		return err
 	}
 
+	serverGroup := router.Group("server", authMiddleware.MiddlewareFunc())
 	{
-		createNewServerHandler := createnewserver.NewHandler(serverRepo)
+		createNewServerHandler := createnewserver.NewHandler(serverRepo, publisher)
 		serverGroup.POST("/:userID", createNewServerHandler.Handle)
 	}
 	{

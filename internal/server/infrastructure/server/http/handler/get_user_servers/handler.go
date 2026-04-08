@@ -1,7 +1,7 @@
 package getuserservers
 
 import (
-	getuserservers "github.com/Arheon/markus-backend/internal/server/domain/query/get_user_servers"
+	getuserservers "github.com/Arheon/markus-backend/internal/server/application/query/get_user_servers"
 	"github.com/Arheon/markus-backend/internal/server/domain/repository"
 	"github.com/Arheon/markus-backend/internal/shared/infrastructure/helpers"
 	"github.com/gin-gonic/gin"

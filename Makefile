@@ -16,7 +16,14 @@ download-dependencies:
 build-app:
 	docker compose exec go_api go build -o ./build/app -tags=musl cmd/app/app.go
 
+build-dispatcher:
+	docker compose exec go_api go build -o ./build/dispatcher -tags=musl cmd/dispatcher/dispatcher.go
+
 run:
 	docker compose exec go_api ./build/app
+
+run-dispatcher:
+	docker compose exec go_api ./build/dispatcher
+
 bash:
 	docker compose exec go_api bash

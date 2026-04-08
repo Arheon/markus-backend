@@ -58,3 +58,4 @@ func Init(env string, injector do.Injector) {
 	logger.Debug("Server exiting")
 
 }
+

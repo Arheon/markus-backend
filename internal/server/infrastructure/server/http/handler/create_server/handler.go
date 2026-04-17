@@ -1,6 +1,7 @@
 package createnewserver
 
 import (
+	"github.com/Arheon/markus-backend/internal/auth/domain/entity"
 	createnewserver "github.com/Arheon/markus-backend/internal/server/application/command/create_new_server"
 	"github.com/Arheon/markus-backend/internal/server/domain/repository"
 	"github.com/Arheon/markus-backend/internal/shared/infrastructure/helpers"
@@ -24,11 +25,13 @@ func NewHandler(
 }
 
 func (h *Handler) Handle(ctx *gin.Context) {
-	var bindings uriBindings
-	if err := ctx.ShouldBindUri(&bindings); err != nil {
-		helpers.AbortWithError(ctx, err)
+	identity, exists := ctx.Get("id")
+	if !exists {
+		helpers.AbortWithUnauthorizedErrorJSON(ctx)
 		return
 	}
+
+	user := identity.(*entity.User)
 
 	var form form
 	if err := ctx.ShouldBind(&form); err != nil {
@@ -37,7 +40,7 @@ func (h *Handler) Handle(ctx *gin.Context) {
 	}
 
 	cmd := createnewserver.NewCommand(h.repo, h.publisher)
-	server, err := cmd.Handle(ctx, bindings.UserID, form.ServerName)
+	server, err := cmd.Handle(ctx, user.ID, form.ServerName)
 	if err != nil {
 		helpers.AbortWithError(ctx, err)
 		return

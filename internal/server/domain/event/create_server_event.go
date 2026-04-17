@@ -7,5 +7,5 @@ type CreateServerEvent struct {
 }
 
 func (e *CreateServerEvent) EventName() string {
-	return "event.create_server"
+	return "event.server.create_server"
 }

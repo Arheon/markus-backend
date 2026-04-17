@@ -113,7 +113,6 @@ func (s *ServerRepositoryTestSuite) TestCreateServer() {
 			if tt.prepareDB != nil {
 				err := tt.prepareDB()
 				s.NoError(err)
-				return
 			}
 
 			server, err := s.repo.CreateNewServer(ctx, userId, *tt.serverName)

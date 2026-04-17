@@ -27,7 +27,7 @@ func (h *Handler) Handle(ctx *gin.Context) {
 	}
 
 	query := getuserinfo.NewQuery(ctx, h.userRepository)
-	h.logger.Debug("Try to get user infi")
+	h.logger.Debug("Try to get user info")
 	user, err := query.Handle(bindings.UserID)
 	if err != nil {
 		globalHelpers.AbortWithError(ctx, err)

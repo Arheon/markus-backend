@@ -42,10 +42,10 @@ func NewPublisher(store Store, opts ...PublisherOption) *Publisher {
 	return p
 }
 
-func Publish[T any](p *Publisher, ctx context.Context, publisher func(c *EventCollector) (T, error)) (T, error) {
+func Publish[T any](p *Publisher, ctx context.Context, publisher func(c *EventCollector) (*T, error)) (*T, error) {
 	collector := &EventCollector{}
 
-	var result T
+	var result *T
 	result, err := publisher(collector)
 	if err != nil {
 		return result, err

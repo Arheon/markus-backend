@@ -1,9 +1,10 @@
 package v1
 
 import (
+	messageController "github.com/Arheon/markus-backend/internal/message/infrastructure/server/http"
+	serverController "github.com/Arheon/markus-backend/internal/server/infrastructure/server/http"
 	"github.com/Arheon/markus-backend/internal/shared/infrastructure/servers/http/router/v1/auth"
 	"github.com/Arheon/markus-backend/internal/shared/infrastructure/servers/http/router/v1/health"
-	"github.com/Arheon/markus-backend/internal/shared/infrastructure/servers/http/router/v1/server"
 	"github.com/Arheon/markus-backend/internal/shared/infrastructure/servers/http/router/v1/user"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/do/v2"
@@ -23,7 +24,11 @@ func InitV1(injector do.Injector, router *gin.Engine) error {
 		return err
 	}
 
-	if err := server.InitController(injector, v1); err != nil {
+	if err := messageController.InitController(injector, v1); err != nil {
+		return err
+	}
+
+	if err := serverController.InitController(injector, v1); err != nil {
 		return err
 	}
 

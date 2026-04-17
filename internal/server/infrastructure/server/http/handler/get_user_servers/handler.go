@@ -1,6 +1,7 @@
 package getuserservers
 
 import (
+	"github.com/Arheon/markus-backend/internal/auth/domain/entity"
 	getuserservers "github.com/Arheon/markus-backend/internal/server/application/query/get_user_servers"
 	"github.com/Arheon/markus-backend/internal/server/domain/repository"
 	"github.com/Arheon/markus-backend/internal/shared/infrastructure/helpers"
@@ -16,14 +17,16 @@ func NewHandler(repo repository.ServerRepository) *Handler {
 }
 
 func (h *Handler) Handle(ctx *gin.Context) {
-	var bindings uriBindings
-	if err := ctx.ShouldBindUri(&bindings); err != nil {
-		helpers.AbortWithError(ctx, err)
+	identiti, exists := ctx.Get("id")
+	if !exists {
+		helpers.AbortWithUnauthorizedErrorJSON(ctx)
 		return
 	}
 
+	user := identiti.(*entity.User)
+
 	query := getuserservers.NewQuery(ctx, h.repo)
-	serverList, err := query.Handle(bindings.UserID)
+	serverList, err := query.Handle(user.ID)
 	if err != nil {
 		helpers.AbortWithError(ctx, err)
 		return

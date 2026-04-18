@@ -55,8 +55,9 @@ func InitDispatcher(env string) error {
 	}
 
 	broker := kafka.NewBroker(producer, kafka.WithTopics(map[string]string{
-		"ServerCreate":         cfg.Broker.BrokerTopics.Server,
-		"ServerInfoCartUpdate": cfg.Broker.BrokerTopics.Server,
+		"event.server.create_server":   cfg.Broker.BrokerTopics.Server,
+		"event.server.create_room":     cfg.Broker.BrokerTopics.Server,
+		"event.message.create_message": cfg.Broker.BrokerTopics.Message,
 	}))
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

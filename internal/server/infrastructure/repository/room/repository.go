@@ -18,10 +18,19 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
+func (r *Repository) GetRoomByID(ctx context.Context, roomID string) (*entity.Room, error) {
+	return gorm.G[*entity.Room](r.db).Preload("RoomCategory", nil).Where("id = ?", roomID).First(ctx)
+}
+
 func (r *Repository) CreateRoom(ctx context.Context, roomName string, serverID string, categoryID *string) (*string, error) {
 	newRoomUUID := uuid.NewString()
 
-	if err := gorm.G[entity.Room](r.db).Create(ctx, &entity.Room{ID: newRoomUUID, ServerID: serverID, RoomCategoryID: categoryID}); err != nil {
+	if err := gorm.G[entity.Room](r.db).Create(ctx, &entity.Room{
+		ID:             newRoomUUID,
+		RoomName:       roomName,
+		ServerID:       serverID,
+		RoomCategoryID: categoryID,
+	}); err != nil {
 		return nil, err
 	}
 
@@ -29,5 +38,5 @@ func (r *Repository) CreateRoom(ctx context.Context, roomName string, serverID s
 }
 
 func (r *Repository) GetServerRooms(ctx context.Context, serverID string) ([]entity.Room, error) {
-	return gorm.G[entity.Room](r.db).Where("server_id = ?", serverID).Find(ctx)
+	return gorm.G[entity.Room](r.db).Preload("RoomCategory", nil).Where("server_id = ?", serverID).Find(ctx)
 }

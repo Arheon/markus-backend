@@ -28,6 +28,13 @@ func NewHandler(
 }
 
 func (h *Handler) Handle(ctx *gin.Context) {
+	var binding uribinding
+	if err := ctx.ShouldBindUri(&binding); err != nil {
+		h.logger.Error("Unexpected uri binding error ", err.Error())
+		helpers.AbortWithBadRequestErrorJSON(ctx)
+		return
+	}
+
 	var form form
 	if err := ctx.ShouldBind(&form); err != nil {
 		h.logger.Error("Undefined gin context error ", err)
@@ -36,7 +43,7 @@ func (h *Handler) Handle(ctx *gin.Context) {
 	}
 
 	cmd := createroom.NewCommand(h.repo, h.publisher)
-	roomID, err := cmd.Handle(ctx, form.RoomName, form.ServerID, form.RoomCategoryID)
+	roomID, err := cmd.Handle(ctx, form.RoomName, binding.ServerID, form.RoomCategoryID)
 	if err != nil {
 		helpers.AbortWithError(ctx, err)
 	}

@@ -16,3 +16,7 @@ type Message struct {
 	MemberID  string
 	RoomID    string
 }
+
+func (m *Message) TableName() string {
+	return "messages"
+}

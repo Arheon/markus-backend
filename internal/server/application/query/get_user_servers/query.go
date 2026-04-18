@@ -3,7 +3,6 @@ package getuserservers
 import (
 	"context"
 
-	domainEntity "github.com/Arheon/markus-backend/internal/server/domain/entity"
 	"github.com/Arheon/markus-backend/internal/server/domain/repository"
 )
 
@@ -19,6 +18,37 @@ func NewQuery(ctx context.Context, repo repository.ServerRepository) *Query {
 	}
 }
 
-func (q *Query) Handle(userID string) ([]*domainEntity.Server, error) {
-	return q.repo.GetAllServersByUserID(q.ctx, userID)
+func (q *Query) Handle(userID string) (*Result, error) {
+	servers, err := q.repo.GetAllServersByUserID(q.ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var serverResults []ResultServer
+	for _, server := range servers {
+		serverResult := ResultServer{
+			ID:      server.ID,
+			Name:    server.Name,
+			Members: []ResultMember{},
+		}
+
+		if len(server.Members) == 0 {
+			serverResults = append(serverResults, serverResult)
+			continue
+		}
+
+		for _, member := range server.Members {
+			memberResult := &ResultMember{
+				ID:   member.ID,
+				Name: member.User.Name,
+			}
+
+			serverResult.Members = append(serverResult.Members, *memberResult)
+		}
+		serverResults = append(serverResults, serverResult)
+	}
+
+	return &Result{
+		Servers: serverResults,
+	}, nil
 }

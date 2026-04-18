@@ -43,6 +43,16 @@ func (k *Broker) Publish(ctx context.Context, msg outbox.Message) error {
 	_, _, err := k.producer.SendMessage(&sarama.ProducerMessage{
 		Topic: topic,
 		Value: sarama.ByteEncoder(msg.Payload),
+		Headers: []sarama.RecordHeader{
+			sarama.RecordHeader{
+				Key:   []byte("event_name"),
+				Value: []byte(msg.Type),
+			},
+			sarama.RecordHeader{
+				Key:   []byte("id"),
+				Value: []byte(msg.ID.String()),
+			},
+		},
 	})
 
 	return err

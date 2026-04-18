@@ -22,8 +22,12 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
+func (r *Repository) GetServerByID(ctx context.Context, serverID string) (*domainEntity.Server, error) {
+	return gorm.G[*domainEntity.Server](r.db).Where("server_id = ?", serverID).First(ctx)
+}
+
 func (r *Repository) GetAllServersByUserID(ctx context.Context, userID string) ([]*domainEntity.Server, error) {
-	quert := gorm.G[*domainEntity.Server](r.db).Preload("Members", nil).
+	quert := gorm.G[*domainEntity.Server](r.db).
 		Joins(
 			clause.JoinTarget{
 				Type:  clause.InnerJoin,
@@ -33,7 +37,27 @@ func (r *Repository) GetAllServersByUserID(ctx context.Context, userID string) (
 				db.Where("server_members.server_id = servers.id").Where("server_members.user_id = ?", userID)
 				return nil
 			},
-		)
+		).
+		Joins(
+			clause.JoinTarget{
+				Type:  clause.InnerJoin,
+				Table: "members",
+			},
+			func(db gorm.JoinBuilder, joinTable, curTable clause.Table) error {
+				db.Where("members.id = server_members.member_id")
+				return nil
+			},
+		).
+		Joins(
+			clause.JoinTarget{
+				Type:  clause.InnerJoin,
+				Table: "users",
+			},
+			func(db gorm.JoinBuilder, joinTable, curTable clause.Table) error {
+				db.Where("users.id = server_members.user_id")
+				return nil
+			},
+		).Preload("Members.User", nil)
 
 	return quert.Find(ctx)
 }

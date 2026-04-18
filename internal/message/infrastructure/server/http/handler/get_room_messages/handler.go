@@ -1,10 +1,9 @@
-package createnewmessage
+package getroommessages
 
 import (
-	createnewmessage "github.com/Arheon/markus-backend/internal/message/application/command/create_new_message"
+	getroommessages "github.com/Arheon/markus-backend/internal/message/application/query/get_room_messages"
 	"github.com/Arheon/markus-backend/internal/message/domain/repository"
 	"github.com/Arheon/markus-backend/internal/shared/infrastructure/helpers"
-	"github.com/Arheon/markus-backend/pkg/outbox"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
@@ -12,17 +11,14 @@ import (
 type Handler struct {
 	logger *logrus.Logger
 	repo   repository.MessageRepository
-	outbox *outbox.Publisher
 }
 
 func NewHandler(
-	publisher *outbox.Publisher,
 	logger *logrus.Logger,
 	repo repository.MessageRepository,
 ) *Handler {
 	return &Handler{
 		logger: logger,
-		outbox: publisher,
 		repo:   repo,
 	}
 }
@@ -30,15 +26,14 @@ func NewHandler(
 func (h *Handler) Handle(ctx *gin.Context) {
 	var f form
 	if err := ctx.ShouldBindJSON(&f); err != nil {
-		h.logger.Error("Unexpected body bindig error ", err.Error())
+		h.logger.Error("Unexpected body binding error ", err.Error())
 		helpers.AbortWithBadRequestErrorJSON(ctx)
 		return
 	}
 
-	cmd := createnewmessage.NewCommand(h.repo, h.outbox)
-	result, err := cmd.Handle(ctx, f.MemberID, f.RoomID, f.Value)
+	query := getroommessages.NewQuery(h.repo)
+	result, err := query.Handle(ctx, f.RoomID)
 	if err != nil {
-		h.logger.Error("Unexpected error ", err.Error())
 		helpers.AbortWithError(ctx, err)
 		return
 	}

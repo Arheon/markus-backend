@@ -4,6 +4,7 @@ import (
 	"github.com/Arheon/markus-backend/internal/server/domain/repository"
 	createroom "github.com/Arheon/markus-backend/internal/server/infrastructure/server/http/handler/create_room"
 	createnewserver "github.com/Arheon/markus-backend/internal/server/infrastructure/server/http/handler/create_server"
+	getserverrooms "github.com/Arheon/markus-backend/internal/server/infrastructure/server/http/handler/get_server_rooms"
 	getuserservers "github.com/Arheon/markus-backend/internal/server/infrastructure/server/http/handler/get_user_servers"
 	"github.com/Arheon/markus-backend/pkg/outbox"
 	jwt "github.com/appleboy/gin-jwt/v3"
@@ -38,16 +39,19 @@ func InitController(injector do.Injector, router *gin.RouterGroup) error {
 	serverGroup := router.Group("server", authMiddleware.MiddlewareFunc())
 	{
 		createNewServerHandler := createnewserver.NewHandler(serverRepo, publisher)
-		serverGroup.POST("/:userID", createNewServerHandler.Handle)
+		serverGroup.POST("", createNewServerHandler.Handle)
 	}
 	{
 		getUserServersHandler := getuserservers.NewHandler(serverRepo)
-		serverGroup.GET("/:userID", getUserServersHandler.Handle)
+		serverGroup.GET("/all", getUserServersHandler.Handle)
 	}
-	roomGroup := serverGroup.Group("room", authMiddleware.MiddlewareFunc())
+	{
+		getServerRoomsQuery := getserverrooms.NewHandler(logger, roomRepo)
+		serverGroup.GET("/:serverID/rooms", getServerRoomsQuery.Handle)
+	}
 	{
 		createRoomHandler := createroom.NewHandler(roomRepo, publisher, logger)
-		roomGroup.POST("/", createRoomHandler.Handle)
+		serverGroup.POST("/:serverID/room", createRoomHandler.Handle)
 	}
 
 	return nil

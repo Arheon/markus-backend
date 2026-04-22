@@ -8,7 +8,7 @@ import (
 )
 
 func InitModule(injector do.Injector) {
-	do.Provide[repository.MessageRepository](injector, func(i do.Injector) (repository.MessageRepository, error) {
+	do.Provide(injector, func(i do.Injector) (repository.MessageRepository, error) {
 		db, err := do.InvokeAs[*gorm.DB](i)
 		if err != nil {
 			return nil, err

@@ -2,6 +2,7 @@ package dependencyinjection
 
 import (
 	"github.com/Arheon/markus-backend/internal/server/domain/repository"
+	"github.com/Arheon/markus-backend/internal/server/infrastructure/repository/member"
 	"github.com/Arheon/markus-backend/internal/server/infrastructure/repository/room"
 	"github.com/Arheon/markus-backend/internal/server/infrastructure/repository/server"
 	"github.com/samber/do/v2"
@@ -25,5 +26,14 @@ func InitModule(injector do.Injector) {
 		}
 
 		return room.NewRepository(db), nil
+	})
+
+	do.Provide(injector, func(i do.Injector) (repository.MemberRepository, error) {
+		db, err := do.InvokeAs[*gorm.DB](i)
+		if err != nil {
+			return nil, err
+		}
+
+		return member.NewRepository(db), nil
 	})
 }

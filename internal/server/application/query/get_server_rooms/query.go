@@ -31,7 +31,7 @@ func (q *Query) Handle(ctx context.Context, serverID string) (*Result, error) {
 		if room.RoomCategoryID == nil {
 			roomsWithoutCategoryResults = append(roomsWithoutCategoryResults, ResultRoom{
 				RoomID:   room.ID,
-				RoomName: "",
+				RoomName: room.RoomName,
 			})
 
 			continue
@@ -48,7 +48,7 @@ func (q *Query) Handle(ctx context.Context, serverID string) (*Result, error) {
 
 		category.Rooms = append(category.Rooms, ResultRoom{
 			RoomID:   room.ID,
-			RoomName: "",
+			RoomName: room.RoomName,
 		})
 
 		roomCategories[category.CategoryID] = category

@@ -4,6 +4,7 @@ import (
 	"github.com/Arheon/markus-backend/internal/message/domain/repository"
 	createnewmessage "github.com/Arheon/markus-backend/internal/message/infrastructure/server/http/handler/create_new_message"
 	getroommessages "github.com/Arheon/markus-backend/internal/message/infrastructure/server/http/handler/get_room_messages"
+	serverRepo "github.com/Arheon/markus-backend/internal/server/domain/repository"
 	"github.com/Arheon/markus-backend/pkg/outbox"
 	jwt "github.com/appleboy/gin-jwt/v3"
 	"github.com/gin-gonic/gin"
@@ -32,9 +33,14 @@ func InitController(injector do.Injector, router *gin.RouterGroup) error {
 		return err
 	}
 
+	memberRepo, err := do.InvokeAs[serverRepo.MemberRepository](injector)
+	if err != nil {
+		return err
+	}
+
 	messageGroup := router.Group("message", authMiddleware.MiddlewareFunc())
 	{
-		createNewMessageHandler := createnewmessage.NewHandler(publisher, logger, messageRepo)
+		createNewMessageHandler := createnewmessage.NewHandler(publisher, logger, messageRepo, memberRepo)
 		messageGroup.POST("", createNewMessageHandler.Handle)
 	}
 	{
